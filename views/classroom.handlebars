@@ -1,0 +1,120 @@
+{{>_navbar}}
+<div class="container">
+    {{#if waitScreen}}
+    <div class="my-4">
+
+        <h3>Class is yet to start</h3>
+        <p>Teacher will start the class , browser refresh not needed </p>
+    </div>
+
+    {{else}}
+    <div class="my-4">
+        {{#if isTeacher}}
+        <button onclick="changeClassStatus( 'started', '{{shortId}}' )" class="btn btn-sm btn-primary">Start</button>
+        <button onclick="changeClassStatus( 'ended', '{{shortId}}' )" class="btn btn-sm btn-danger">End</button>
+        {{/if}}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col border">
+            <h5 class="mt-1">Student List</h5>
+            <ul id="studentList">
+
+            </ul>
+        </div>
+        <div class="col border">
+            <h5 class="mt-1">Teacher List</h5>
+            <ul id="teacherList">
+
+            </ul>
+        </div>
+    </div>
+    {{/if}}
+
+</div>
+
+<script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+<script>
+
+
+
+    function changeClassStatus(status, shortId) {
+
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        let raw = JSON.stringify({ status, shortId });
+
+        var requestOptions = {
+            method: 'PATCH',
+            body: raw,
+            headers: myHeaders,
+        };
+
+        fetch("/classrooms", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+
+                //emit class started
+                if (data.message == "status changed to started") {
+                    socket.emit('classStart', { shortId: '{{shortId}}', initiator: "{{username}}", isTeacher: "{{isTeacher}}" });
+                }
+                //emit class ended - broadcast 
+                if (data.message == "status changed to ended") {
+                    socket.emit('classEnd', { shortId: '{{shortId}}', initiator: "{{username}}", isTeacher: "{{isTeacher}}" });
+                }
+
+                alert(JSON.stringify(data))
+            })
+            .catch((e) => {
+                console.error(e);
+                alert("Error");
+            })
+    }
+
+
+    let studentList = document.getElementById("studentList");
+    let teacherList = document.getElementById("teacherList");
+
+    const socket = io();
+
+    //try to register
+    if ('{{waitScreen}}' != "true") {
+        socket.emit('register', { shortId: '{{shortId}}', username: "{{username}}", isTeacher: "{{isTeacher}}" });
+    }
+
+    socket.on('classEndConfirm', (msg) => {
+        //console.log(msg)
+        alert("Class Ended")
+        if (msg.shortId == '{{shortId}}') {
+            window.location.assign("/");
+        }
+    });
+
+
+    socket.on('classStartConfirm', (msg) => {
+        //console.log(msg)
+        if (msg.shortId == '{{shortId}}' && "{{isTeacher}}" == 'false') {
+            location.reload();
+        }
+    });
+
+    socket.on('addParticipant', msg => {
+        //console.log(msg)
+        if (msg.shortId == '{{shortId}}') {
+
+            let li = document.createElement("li");
+            li.appendChild(document.createTextNode(msg.username));
+
+
+            if (msg.isTeacher == 'true') {
+                teacherList.appendChild(li);
+            } else if (msg.isTeacher == 'false') {
+                studentList.appendChild(li);
+            }
+
+
+        }
+
+    })
+
+</script>

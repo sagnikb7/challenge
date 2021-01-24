@@ -1,0 +1,20 @@
+<nav class="navbar navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            ClassRoom
+        </a>
+        <div style="margin-left:auto;">
+            <button class="btn btn-secondary" onclick="logMeOut();">Logout</button>
+        </div>
+    </div>
+
+
+</nav>
+
+
+<script>
+    function logMeOut() {
+        window.location.assign("/users/logout");
+    }
+
+</script>
