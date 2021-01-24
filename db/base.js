@@ -20,6 +20,16 @@ class Base {
 
     }
 
+    async deleteOne(filter) {
+        try {
+            let status = await this.dbModel.deleteOne(filter);
+            return status;
+        } catch (error) {
+            console.error("Object not deleted");
+            throw error
+        }
+    }
+
     async findOne(filter) {
         try {
             let data = await this.dbModel.findOne(filter)
@@ -42,7 +52,7 @@ class Base {
 
     async updateOne(filter, updates) {
         try {
-            let status = await this.dbModel.updateOne(filter, updates)
+            let status = await this.dbModel.updateOne(filter, updates, { runValidators: true })
             return status;
         } catch (error) {
             console.error("Coundn't update one");

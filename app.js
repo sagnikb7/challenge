@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const exphbs = require('express-handlebars');
+const nocache = require('nocache')
 
 
 const result = dotenv.config()
@@ -16,6 +17,7 @@ db.connect(process.env.MONGODB_URI)
 //SETUP
 const PORT = process.env.PORT;
 const app = express();
+app.use(nocache())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -42,35 +44,71 @@ const server = app.listen(PORT, () => {
     console.log(`server started on ${PORT}`)
 });
 
+
+
+//SOCKET EVENTS
+
+
+const ParticipantDAOClass = require('./db/participantDAO');
+const ParticipantDAO = new ParticipantDAOClass();
+
 const io = require('socket.io')(server);
 
 io.on('connection', client => {
 
-    console.log("--> Recieved Connection")
+
+    // console.log("")
+
+    client.on('joinChannel', msg => {
+        console.log(`--> Joining channel ${msg.shortId}`);
+        client.join(msg.shortId);
+    });
 
     client.on('register', msg => {
         msg.clientId = client.id;
         console.log("--> req for register", msg)
+
         //on successful register - emit event and push to db
-        io.emit('addParticipant', msg)
+
+        let { username, shortId, clientId, isTeacher } = msg;
+        io.to(shortId).emit('addParticipant', msg);
+
+        let role = null;
+        if (isTeacher == "true") {
+            role = "teacher";
+        } else if (isTeacher == "false") {
+            role = "student";
+        }
+
+        ParticipantDAO.save({ shortId, username, clientId, role })
+
 
     });
 
     client.on('classStart', msg => {
-        //broadcast to all
         console.log('--> classStart');
-        io.emit('classStartConfirm', msg);
+        io.to(msg.shortId).emit('classStartConfirm', msg);
     });
 
     client.on('classEnd', msg => {
-        //broadcast to all
         console.log('--> classEnd');
-        io.emit('classEndConfirm', msg);
+        io.to(msg.shortId).emit('classEndConfirm', msg);
     });
 
     client.on('disconnect', () => {
-        //disconnect remove 
-        console.log('--> disconnected');
+        //disconnect remove
+
+
+        let ref = client.handshake.headers.referer;
+        ref = ref.split("/");
+        let size = ref.length - 1;
+
+        let channel = ref[size];
+        let clientId = client.id;
+
+        console.log(`--> disconnected ${clientId} from ${channel}`);
+        io.to(channel).emit('deleteParticipant', { clientId })
+        ParticipantDAO.deleteOne({ clientId })
     });
 });
 

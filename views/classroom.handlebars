@@ -29,6 +29,7 @@
             </ul>
         </div>
     </div>
+
     {{/if}}
 
 </div>
@@ -76,45 +77,39 @@
     let teacherList = document.getElementById("teacherList");
 
     const socket = io();
-
+    socket.emit('joinChannel', { shortId: '{{shortId}}' });
     //try to register
     if ('{{waitScreen}}' != "true") {
         socket.emit('register', { shortId: '{{shortId}}', username: "{{username}}", isTeacher: "{{isTeacher}}" });
     }
 
     socket.on('classEndConfirm', (msg) => {
-        //console.log(msg)
-        alert("Class Ended")
-        if (msg.shortId == '{{shortId}}') {
-            window.location.assign("/");
-        }
+        window.location.assign("/");
     });
 
 
     socket.on('classStartConfirm', (msg) => {
-        //console.log(msg)
-        if (msg.shortId == '{{shortId}}' && "{{isTeacher}}" == 'false') {
-            location.reload();
-        }
+        if ("{{isTeacher}}" == 'false') { location.reload(); }
     });
 
     socket.on('addParticipant', msg => {
         //console.log(msg)
-        if (msg.shortId == '{{shortId}}') {
 
-            let li = document.createElement("li");
-            li.appendChild(document.createTextNode(msg.username));
-
-
-            if (msg.isTeacher == 'true') {
-                teacherList.appendChild(li);
-            } else if (msg.isTeacher == 'false') {
-                studentList.appendChild(li);
-            }
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(msg.username));
+        li.setAttribute("id", msg.clientId);
 
 
+        if (msg.isTeacher == 'true') {
+            teacherList.appendChild(li);
+        } else if (msg.isTeacher == 'false') {
+            studentList.appendChild(li);
         }
+    });
 
+    socket.on('deleteParticipant', msg => {
+        let elem = document.getElementById(msg.clientId);
+        elem.parentNode.removeChild(elem);
     })
 
 </script>

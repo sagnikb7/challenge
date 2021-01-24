@@ -44,9 +44,10 @@ class UserController {
         let classroomObj = await ClassroomDAO.findOne({ shortId });
 
         if (classroomObj) {
+            let { status } = classroomObj;
             if (role == 'teacher') {
-                res.render('classroom', { username, shortId, isTeacher: true })
-            } else if (role == "student" && classroomObj.status == "started") {
+                res.render('classroom', { username, shortId, isTeacher: true, })
+            } else if (role == "student" && status == "started") {
                 res.render('classroom', { username, shortId, isTeacher: false })
             } else {
                 res.render('classroom', { username, shortId, isTeacher: false, waitScreen: true })

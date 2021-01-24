@@ -1,7 +1,39 @@
 const jwt = require('jsonwebtoken');
+const participantDAO = require('../db/participantDAO');
+
+const ParticipantDAOClass = require('../db/participantDAO');
+const ParticipantDAO = new ParticipantDAOClass();
 
 class Auth {
     constructor() { }
+
+    async checkParticipation(req, res, next) {
+        //check if user active in one class 
+        const token = req.cookies.jwt || "";
+        try {
+            let { shortId } = req.params;
+
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            let { username, role } = decoded;
+            let data = await ParticipantDAO.findOne({ username });
+            if (data) {
+                if (data.shortId == shortId) {
+                    return res.status(401).send({ "message": "Already inside the class" })
+                } else {
+                    return res.status(401).send({ "message": "Attending another the class" })
+                }
+            } else {
+                next();
+            }
+
+
+
+        } catch (error) {
+            console.error(error)
+            return res.status(500).send({ "message": "unknow error", "error": error.message });
+        }
+
+    }
 
     verifyRoleTeacher(req, res, next) {
         const token = req.cookies.jwt || "";
@@ -46,6 +78,7 @@ let authObj = new Auth()
 module.exports = {
     verifyLoggedIn: authObj.verifyLoggedIn,
     verifyLoggedOut: authObj.verifyLoggedOut,
-    verifyRoleTeacher: authObj.verifyRoleTeacher
+    verifyRoleTeacher: authObj.verifyRoleTeacher,
+    checkParticipation: authObj.checkParticipation
 
 }

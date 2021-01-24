@@ -6,8 +6,8 @@ const classroomSchema = new Schema({
     status: { type: String, default: 'new', enum: ['started', 'ended', 'new'] },
     active: { type: Boolean, default: true },
     createdBy: { type: String, required: true },
-    studentList: { type: Array, default: [] },
-    teacherList: { type: Array, default: [] },
+    // studentList: { type: Array, default: [] },
+    // teacherList: { type: Array, default: [] },
 }, { timestamps: true });
 
 const classroomModel = mongoose.model('classrooms', classroomSchema);
