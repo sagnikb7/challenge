@@ -52,6 +52,9 @@ const server = app.listen(PORT, () => {
 const ParticipantDAOClass = require('./db/participantDAO');
 const ParticipantDAO = new ParticipantDAOClass();
 
+const ClassroomLogDAOClass = require('./db/classroomLogDAO');
+const ClassroomLogDAO = new ClassroomLogDAOClass();
+
 const io = require('socket.io')(server);
 
 io.on('connection', client => {
@@ -79,6 +82,7 @@ io.on('connection', client => {
         } else if (isTeacher == "false") {
             role = "student";
         }
+        //logEVENT*
 
         ParticipantDAO.save({ shortId, username, clientId, role })
 
@@ -88,11 +92,17 @@ io.on('connection', client => {
     client.on('classStart', msg => {
         console.log('--> classStart');
         io.to(msg.shortId).emit('classStartConfirm', msg);
+
+        //logEVENT
+        ClassroomLogDAO.save({ shortId: msg.shortId, event: 'started', username: msg.initiator, role: 'teacher' });
     });
 
     client.on('classEnd', msg => {
         console.log('--> classEnd');
         io.to(msg.shortId).emit('classEndConfirm', msg);
+
+        //logEVENT
+        ClassroomLogDAO.save({ shortId: msg.shortId, event: 'ended', username: msg.initiator, role: 'teacher' });
     });
 
     client.on('disconnect', () => {
@@ -108,6 +118,8 @@ io.on('connection', client => {
 
         console.log(`--> disconnected ${clientId} from ${channel}`);
         io.to(channel).emit('deleteParticipant', { clientId })
+        //logEVENT*
+        // ClassroomLogDAO.save({shortId:channel,event:'disconnect',username:msg.initiator,role:'teacher'});
         ParticipantDAO.deleteOne({ clientId })
     });
 });

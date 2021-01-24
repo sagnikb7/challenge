@@ -17,10 +17,10 @@ class Auth {
             let { username, role } = decoded;
             let data = await ParticipantDAO.findOne({ username });
             if (data) {
-                if (data.shortId == shortId) {
-                    return res.status(401).send({ "message": "Already inside the class" })
+                if (data.shortId != shortId) {
+                    return res.status(401).send({ "message": "Attending another class" })
                 } else {
-                    return res.status(401).send({ "message": "Attending another the class" })
+                    return res.status(401).send({ "message": "Already inside the class" })
                 }
             } else {
                 next();
