@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-6 col-lg-4 mx-auto mt-4 border p-4">
-            <form action="/users/login" method="POST">
+            <div>
                 <h3>Login</h3>
 
                 <div class="form-group mt-2">
@@ -12,8 +12,47 @@
                     <label for="password">Password</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="" required>
                 </div>
-                <button class="btn btn-primary mt-4" type="submit">Submit</button>
-            </form>
+                <button onclick="logmeIn()" class="btn btn-primary mt-4" type="submit">Submit</button>
+            </div>
+
         </div>
     </div>
 </div>
+
+
+<script>
+    function logmeIn() {
+        const u = document.getElementById("username").value;
+        const p = document.getElementById("password").value;
+
+        if (u == "" || p == "") {
+            alert("Both Fields are mandatory")
+        } else {
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            let raw = JSON.stringify({ "username": u, "password": p });
+
+            let requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+            };
+
+            fetch("/users/login", requestOptions)
+                .then(response => {
+                    let statusCode = response.status;
+                    if (statusCode == 200) {
+                        window.location.href = "/users/dashboard";
+                    } else {
+                        alert(`Wrong Creds ${statusCode}`)
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    alert("error");
+                });
+        }
+
+    }
+</script>

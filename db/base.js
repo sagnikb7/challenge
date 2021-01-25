@@ -3,8 +3,6 @@
 class Base {
 
     constructor(model) {
-        // this.collectionName = collectionName;
-        // this.dbModel = mongoose.model(collectionName)
         this.dbModel = model;
     }
 
@@ -33,6 +31,16 @@ class Base {
     async findOne(filter) {
         try {
             let data = await this.dbModel.findOne(filter)
+            return data;
+        } catch (error) {
+            console.error("Coundn't findOne");
+            throw error;
+        }
+    }
+
+    async findAndSort(findFilter, sortFilter, projections = {}) {
+        try {
+            let data = await this.dbModel.find(findFilter, projections).sort(sortFilter)
             return data;
         } catch (error) {
             console.error("Coundn't findOne");

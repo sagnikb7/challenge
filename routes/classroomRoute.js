@@ -7,12 +7,13 @@ const classroomController = new ClassrooomControllerClass();
 
 
 
-// Register Classroom
+// Register classroom
 router.put('/', verifyRoleTeacher, classroomController.create);
 
+//Enroll to a classroom
 router.get('/:shortId', verifyLoggedIn, checkParticipation, classroomController.enroll)
 
-//Flip Classroom status
+//Flip classroom status
 router.patch('/', verifyRoleTeacher, classroomController.changeClassroomStatus);
 
 

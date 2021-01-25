@@ -41,8 +41,8 @@ class UserController {
 
                     let token = jwt.sign({ "username": user.username, "role": user.role }, process.env.JWT_SECRET, { expiresIn: '1h' })
                     res.cookie('jwt', token, { httpOnly: true, secure: false, maxAge: 3600000 })
-                    // res.status(200).send({ "message": "Login Success" });
-                    res.redirect('/users/dashboard');
+                    res.status(200).send({ "message": "Login Success" });
+
                 } else {
                     res.status(401).send({ "message": "Wrong creds" })
                 }
@@ -50,7 +50,7 @@ class UserController {
                 res.status(401).send({ "message": "Wrong creds" })
             }
         } catch (error) {
-            console.error(error)
+            // console.error(error)
             res.status(400).send({ "message": "Login error", "error": error.message })
         }
 

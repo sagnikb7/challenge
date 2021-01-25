@@ -37,7 +37,8 @@
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script>
 
-
+    let studentList = document.getElementById("studentList");
+    let teacherList = document.getElementById("teacherList");
 
     function changeClassStatus(status, shortId) {
 
@@ -70,18 +71,42 @@
                 console.error(e);
                 alert("Error");
             })
-    }
-
-
-    let studentList = document.getElementById("studentList");
-    let teacherList = document.getElementById("teacherList");
+    };
 
     const socket = io();
     socket.emit('joinChannel', { shortId: '{{shortId}}' });
+
     //try to register
     if ('{{waitScreen}}' != "true") {
+
+        //get participantsList from db
+        fetch("/participants/classroom/{{shortId}}", { method: 'GET' })
+            .then(response => response.json())
+            .then(result => {
+
+                result.participantsList.forEach((p) => {
+
+
+                    let elem = document.getElementById(p.clientId);
+                    if (!elem) {
+
+                        let li = document.createElement("li");
+                        li.appendChild(document.createTextNode(p.username));
+                        li.setAttribute("id", p.clientId);
+
+                        if (p.role == 'teacher') {
+                            teacherList.appendChild(li);
+                        } else if (p.role == 'student') {
+                            studentList.appendChild(li);
+                        }
+                    }
+
+                });
+            })
+            .catch(error => console.log('error', error));
+
         socket.emit('register', { shortId: '{{shortId}}', username: "{{username}}", isTeacher: "{{isTeacher}}" });
-    }
+    };
 
     socket.on('classEndConfirm', (msg) => {
         window.location.assign("/");
@@ -94,22 +119,26 @@
 
     socket.on('addParticipant', msg => {
         //console.log(msg)
+        let elem = document.getElementById(msg.clientId);
+        if (!elem) {
 
-        let li = document.createElement("li");
-        li.appendChild(document.createTextNode(msg.username));
-        li.setAttribute("id", msg.clientId);
+            let li = document.createElement("li");
+            li.appendChild(document.createTextNode(msg.username));
+            li.setAttribute("id", msg.clientId);
 
 
-        if (msg.isTeacher == 'true') {
-            teacherList.appendChild(li);
-        } else if (msg.isTeacher == 'false') {
-            studentList.appendChild(li);
+            if (msg.isTeacher == 'true') {
+                teacherList.appendChild(li);
+            } else if (msg.isTeacher == 'false') {
+                studentList.appendChild(li);
+            }
         }
+
     });
 
     socket.on('deleteParticipant', msg => {
         let elem = document.getElementById(msg.clientId);
         elem.parentNode.removeChild(elem);
-    })
+    });
 
 </script>

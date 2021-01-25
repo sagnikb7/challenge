@@ -1,19 +1,15 @@
-const jwt = require('jsonwebtoken');
 const { nanoid } = require('nanoid');
+
 const ClassroomDAOClass = require('../db/classroomDAO');
 const ClassroomDAO = new ClassroomDAOClass();
-
 class UserController {
 
-    constructor() {
-    }
+    constructor() { }
 
     async create(req, res) {
         try {
 
-            let token = req.cookies.jwt || "";
-            let decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const createdBy = decoded.username;
+            let createdBy = res.locals.username;
 
             const shortId = nanoid(10);
 
@@ -34,14 +30,14 @@ class UserController {
 
     async enroll(req, res) {
 
-        let token = req.cookies.jwt || "";
-        let decoded = jwt.verify(token, process.env.JWT_SECRET);
-        let role = decoded.role;
-        let username = decoded.username;
+
+        let role = res.locals.role;
+        let username = res.locals.username;
 
         const shortId = req.params.shortId
 
         let classroomObj = await ClassroomDAO.findOne({ shortId });
+
 
         if (classroomObj) {
             let { status } = classroomObj;

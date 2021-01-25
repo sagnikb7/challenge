@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyLoggedIn, verifyLoggedOut } = require('../utils/auth')
+const { verifyLoggedIn } = require('../utils/auth')
 
 const UserControllerClass = require('../controllers/userController');
 const userController = new UserControllerClass();

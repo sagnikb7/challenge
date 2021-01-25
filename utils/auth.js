@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const participantDAO = require('../db/participantDAO');
 
 const ParticipantDAOClass = require('../db/participantDAO');
 const ParticipantDAO = new ParticipantDAOClass();
@@ -20,14 +19,12 @@ class Auth {
                 if (data.shortId != shortId) {
                     return res.status(401).send({ "message": "Attending another class" })
                 } else {
-                    return res.status(401).send({ "message": "Already inside the class" })
+                    // return res.status(401).send({ "message": "Already inside the class" })
+                    next();
                 }
             } else {
                 next();
             }
-
-
-
         } catch (error) {
             console.error(error)
             return res.status(500).send({ "message": "unknow error", "error": error.message });
@@ -37,30 +34,39 @@ class Auth {
 
     verifyRoleTeacher(req, res, next) {
         const token = req.cookies.jwt || "";
-        try {
+
+        if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             if (decoded && decoded.role == 'teacher') {
                 res.locals.username = decoded.username;
                 res.locals.role = decoded.role;
                 next();
             } else {
-                return res.status(401).send({ "message": "unauthorized" })
+                return res.status(401).send({ "message": "unauthorized (u2)" });
             }
-        } catch (error) { return res.status(401).send({ "message": "unauthorized" }) }
+        } else {
+            return res.status(401).send({ "message": "unauthorized (u1)" })
+        }
+
     }
 
     verifyLoggedIn(req, res, next) {
+
         const token = req.cookies.jwt || "";
-        try {
+
+        if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             if (decoded) {
                 res.locals.username = decoded.username;
                 res.locals.role = decoded.role;
                 next();
             } else {
-                return res.redirect('/')
+                return res.status(401).send({ "message": "unauthorized (u2)" });
             }
-        } catch (error) { return res.redirect('/') }
+        } else {
+            return res.status(401).send({ "message": "unauthorized (u1)" });
+        }
+
 
     }
     verifyLoggedOut(req, res, next) {

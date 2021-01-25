@@ -7,3 +7,9 @@ require('crypto').randomBytes(64).toString('hex')
 * Teachers can create class rooms - ( start/end ) it 
 * Classes starts/end in realtime for student - no refresh needed
 * A teacher or student cannot attend multiple classes at the same time
+
+
+TODO 
+Log API
+
+Bug: refresh - duplicate own
