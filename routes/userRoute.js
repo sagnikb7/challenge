@@ -14,7 +14,7 @@ router.put('/', userController.create);
 router.post('/login', userController.login);
 
 //Logout Users
-router.get("/logout", async (req, res) => {
+router.get("/logout", (req, res) => {
     res.clearCookie("jwt");
     res.redirect("/");
 });

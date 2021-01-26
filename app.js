@@ -33,11 +33,13 @@ const { verifyLoggedOut } = require('./utils/auth');
 
 const userRoute = require('./routes/userRoute');
 const classroomRoute = require('./routes/classroomRoute');
+const classroomLogRoute = require('./routes/classroomLogRoute');
 const participantRoute = require('./routes/participantRoute');
 
 app.get('/', verifyLoggedOut, (req, res) => { res.render('login') });
 app.use('/users', userRoute);
 app.use('/classrooms', classroomRoute);
+app.use('/classroomlogs', classroomLogRoute);
 app.use('/participants', participantRoute);
 
 

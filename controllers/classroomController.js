@@ -17,7 +17,7 @@ class UserController {
 
             let status = await ClassroomDAO.save(classroomObj);
             if (status) {
-                res.status(201).send({ "message": `classroom created with id ${shortId}` });
+                res.status(201).send({ "message": "classroom created", "id": shortId });
             }
             else {
                 res.status(400).send({ "message": "classroom not created (status false)", "error": status })

@@ -26,7 +26,8 @@ function socketEvents(io) {
             //on successful register - emit event and push to db
 
             let { username, shortId, clientId, isTeacher } = msg;
-            io.to(shortId).emit('addParticipant', msg);
+
+
 
             let role = null;
             if (isTeacher == "true") {
@@ -36,8 +37,13 @@ function socketEvents(io) {
             }
             //logEVENT
             ClassroomLogDAO.save({ shortId, event: 'join', username, role });
-            ParticipantDAO.save({ shortId, username, clientId, role })
+            ParticipantDAO.save({ shortId, username, clientId, role });
 
+            // setTimeout(() => {
+            //     io.to(shortId).emit('addParticipant', msg);
+            // }, 500)
+
+            io.to(shortId).emit('addParticipant', msg);
 
         });
 
@@ -70,19 +76,28 @@ function socketEvents(io) {
 
             console.log(`--> disconnected ${clientId} from ${channel}`);
 
-            ParticipantDAO.findOne({ clientId }).then((data) => {
+            ParticipantDAO.findOne({ clientId })
+                .then((data) => {
 
-                //logEVENT (get client info)
-                ClassroomLogDAO.save(
-                    {
-                        shortId: data.shortId,
-                        event: 'disconnect',
-                        username: data.username,
-                        role: data.role
-                    });
-                ParticipantDAO.deleteOne({ clientId });
-            })
-            io.to(channel).emit('deleteParticipant', { clientId })
+                    //logEVENT (get client info)
+                    if (data) {
+                        ClassroomLogDAO.save(
+                            {
+                                shortId: data.shortId,
+                                event: 'disconnect',
+                                username: data.username,
+                                role: data.role
+                            });
+                    }
+
+                    ParticipantDAO.deleteOne({ clientId });
+                }).catch((e) => {
+                    console.log("error ->", e);
+                });
+
+            setTimeout(() => {
+                io.to(channel).emit('deleteParticipant', { clientId });
+            }, 1500);
 
         });
     });

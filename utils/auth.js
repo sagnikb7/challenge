@@ -3,49 +3,56 @@ const jwt = require('jsonwebtoken');
 const ParticipantDAOClass = require('../db/participantDAO');
 const ParticipantDAO = new ParticipantDAOClass();
 
+const SECRET = process.env.JWT_SECRET;
 class Auth {
     constructor() { }
 
     async checkParticipation(req, res, next) {
-        //check if user active in one class 
-        const token = req.cookies.jwt || "";
         try {
             let { shortId } = req.params;
+            let { username } = res.locals;
 
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            let { username, role } = decoded;
+            // console.log("checkParticipation", shortId, username)
+
             let data = await ParticipantDAO.findOne({ username });
             if (data) {
-                if (data.shortId != shortId) {
+                if (data.shortId != shortId) { //in different class
                     return res.status(401).send({ "message": "Attending another class" })
-                } else {
-                    // return res.status(401).send({ "message": "Already inside the class" })
+                } else { //already in same class
                     next();
                 }
-            } else {
+            } else { //not yet participated
                 next();
             }
-        } catch (error) {
-            console.error(error)
-            return res.status(500).send({ "message": "unknow error", "error": error.message });
-        }
 
+        } catch (error) {
+            console.log(error.message);
+            return res.status(500).send({ "message": "error" }); //unknown error
+        }
     }
 
     verifyRoleTeacher(req, res, next) {
         const token = req.cookies.jwt || "";
 
         if (token) {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            if (decoded && decoded.role == 'teacher') {
-                res.locals.username = decoded.username;
-                res.locals.role = decoded.role;
-                next();
-            } else {
-                return res.status(401).send({ "message": "unauthorized (u2)" });
+            try {
+                const decoded = jwt.verify(token, SECRET);
+                if (decoded.role == 'teacher') {
+                    res.locals.username = decoded.username;
+                    res.locals.role = decoded.role;
+                    next();
+                } else {
+                    return res.status(401).send({ "message": "unauthorized (u3)" });//invalid role
+                }
+
+            } catch (error) {
+                res.clearCookie("jwt");
+                console.log(error.message);
+                return res.status(401).send({ "message": "unauthorized (u2)" });//invalid token
             }
+
         } else {
-            return res.status(401).send({ "message": "unauthorized (u1)" })
+            return res.status(401).send({ "message": "unauthorized (u1)" }) //no token
         }
 
     }
@@ -55,20 +62,23 @@ class Auth {
         const token = req.cookies.jwt || "";
 
         if (token) {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            if (decoded) {
+
+            try {
+                const decoded = jwt.verify(token, SECRET);
                 res.locals.username = decoded.username;
                 res.locals.role = decoded.role;
                 next();
-            } else {
-                return res.status(401).send({ "message": "unauthorized (u2)" });
+            } catch (error) {
+                res.clearCookie("jwt");
+                console.log(error.message);
+                return res.status(401).send({ "message": "unauthorized (u2)" }); //invalid token
             }
+
         } else {
-            return res.status(401).send({ "message": "unauthorized (u1)" });
+            return res.status(401).send({ "message": "unauthorized (u1)" }); // no token 
         }
-
-
     }
+
     verifyLoggedOut(req, res, next) {
         const token = req.cookies.jwt || "";
         if (!token) {

@@ -12,12 +12,22 @@
     function createClassRoom() {
         fetch('/classrooms', {
             method: 'PUT'
-        }).then(response => response.json())
-            .then(data => { alert(JSON.stringify(data)) })
-            .catch((e) => {
-                console.error(e);
-                alert("Error")
-            })
+        }).then(async response => {
+            let r = await response.json();
+            if (response.status == 201) {
+
+                let id = r.id
+                let msg = `Visit classroom : ${id}`;
+                if (confirm(msg)) {
+                    window.location.href = `/classrooms/${id}`
+                }
+            } else {
+                alert(JSON.stringify(response.json()))
+            }
+        }).catch((e) => {
+            console.error(e);
+            alert("Error")
+        })
     }
 
 </script>
