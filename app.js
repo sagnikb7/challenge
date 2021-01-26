@@ -6,8 +6,14 @@ const exphbs = require('express-handlebars');
 const nocache = require('nocache')
 
 
-const result = dotenv.config()
-if (result.error) { throw result.error }
+//ENV CONFIG
+if (process.env.NODE_ENV == "local" || process.env.NODE_ENV == "production") {
+    const result = dotenv.config();
+    if (result.error) {
+        throw result.error;
+    }
+}
+
 
 const db = require('./db/connection');
 db.connect(process.env.MONGODB_URI)

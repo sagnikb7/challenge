@@ -4,8 +4,8 @@
   "description": "virtual class challenge",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "NODE_ENV=production node app.js",
+    "dev": "NODE_ENV=local nodemon app.js"
   },
   "keywords": [],
   "author": "",
