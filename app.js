@@ -7,11 +7,8 @@ const nocache = require('nocache')
 
 
 //ENV CONFIG
-if (process.env.NODE_ENV == "local" || process.env.NODE_ENV == "production") {
+if (process.env.NODE_ENV == "local") {
     const result = dotenv.config();
-    if (result.error) {
-        throw result.error;
-    }
 }
 
 
