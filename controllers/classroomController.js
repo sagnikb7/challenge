@@ -5,7 +5,10 @@ const ClassroomDAO = new ClassroomDAOClass();
 class UserController {
 
     constructor() { }
-
+    async activeClasses(req, res) {
+        let activeClassrooms = await ClassroomDAO.findAndSort({ status: "started" }, { createdAt: -1 });
+        res.status(200).send({ "active": activeClassrooms })
+    }
     async create(req, res) {
         try {
 

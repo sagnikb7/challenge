@@ -40,7 +40,7 @@ class Base {
 
     async findAndSort(findFilter, sortFilter, projections = {}) {
         try {
-            let data = await this.dbModel.find(findFilter, projections).sort(sortFilter)
+            let data = await this.dbModel.find(findFilter, projections).sort(sortFilter).lean();
             return data;
         } catch (error) {
             console.error("Coundn't findOne");

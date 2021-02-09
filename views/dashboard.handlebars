@@ -4,11 +4,36 @@
         <h1>Welcome: {{role}}, {{username}}</h1>
         {{#if isTeacher}}
         <button onclick="createClassRoom()" class="btn btn-primary">Add classroom</button>
+        {{else}}
+        <button onclick="getActiveClasses()">Get classes</button>
+        <div id="activeClasses">
+            {{#each class}}
+            <h3>Created by : {{createdBy}} <span><a href="/classrooms/{{shortId}}">Visit class</a></span></h3>
+
+            {{/each}}
+        </div>
+
         {{/if}}
     </div>
 </div>
 
 <script>
+    function getActiveClasses() {
+        fetch('/classrooms/active/', { method: "GET" }).then((response) => {
+            return response.json()
+        }).then(data => {
+            console.log(data)
+            document.getElementById("activeClasses").innerHTML = "";
+            let classes = ""
+            data.active.forEach((d) => {
+                let elem = `<h3>Created by : ${d.createdBy} <span><a href="/classrooms/${d.shortId}">Visit class</a></span></h3>`
+                classes += elem;
+            });
+            document.getElementById("activeClasses").innerHTML = classes;
+        }).catch((e) => {
+            console.error(e);
+        });
+    }
     function createClassRoom() {
         fetch('/classrooms', {
             method: 'PUT'

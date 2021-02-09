@@ -5,6 +5,7 @@ const { verifyLoggedIn } = require('../utils/auth')
 const UserControllerClass = require('../controllers/userController');
 const userController = new UserControllerClass();
 
+const classroomDAO = new (require('../db/classroomDAO'))();
 
 
 // Register Users
@@ -21,10 +22,11 @@ router.get("/logout", (req, res) => {
 
 
 //Dashboard
-router.get('/dashboard', verifyLoggedIn, (req, res, next) => {
+router.get('/dashboard', verifyLoggedIn, async (req, res, next) => {
     let isTeacher = false;
     if (res.locals.role == "teacher") { isTeacher = true }
-    res.render('dashboard', { "username": res.locals.username, "role": res.locals.role, "isTeacher": isTeacher });
+    let activeClassrooms = await classroomDAO.findAndSort({ status: "started" }, { createdAt: -1 });
+    res.render('dashboard', { "username": res.locals.username, "role": res.locals.role, "isTeacher": isTeacher, "class": activeClassrooms });
 })
 
 module.exports = router;

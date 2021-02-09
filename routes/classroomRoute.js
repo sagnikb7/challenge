@@ -11,6 +11,7 @@ const classroomController = new ClassrooomControllerClass();
 router.put('/', verifyRoleTeacher, classroomController.create);
 
 //Enroll to a classroom
+router.get('/active', verifyLoggedIn, classroomController.activeClasses)
 router.get('/:shortId', verifyLoggedIn, checkParticipation, classroomController.enroll)
 
 //Flip classroom status

@@ -1,0 +1,144 @@
+{
+	"info": {
+		"_postman_id": "016c6355-4f38-46a5-b734-3dff1bf0a532",
+		"name": "Challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register User",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"sagnik\",\n    \"password\": \"password\",\n    \"role\": \"student\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/users/",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"t1\",\n    \"password\": \"password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/users/login",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Classroom",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost/classrooms",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"classrooms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Classroom status",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"shortId\": \"4Es5InrLrE\",\n    \"status\": \"started\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/classrooms/",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"classrooms",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List participants in a classroom",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/participants/classroom/RRPkHrSJZ0",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"participants",
+						"classroom",
+						"RRPkHrSJZ0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Classroom Logs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/classroomlogs/-lOHhRjDvj",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"classroomlogs",
+						"-lOHhRjDvj"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
